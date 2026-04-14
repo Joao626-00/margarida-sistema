@@ -60,10 +60,33 @@
 
   <!-- CHAMADA -->
   <div id="chamada" class="section oculto">
-    <h2>Chamada</h2>
-    <p>Em construção...</p>
-    <div id="lista-chamada"></div>
+
+  <h2>📌 Chamada</h2>
+
+  <!-- LISTA DE TURMAS -->
+  <div id="lista-turmas" class="grid-turmas"></div>
+
+  <!-- TELA DA CHAMADA (OCULTA) -->
+  <div id="chamada-turma" class="oculto">
+
+    <h3 id="titulo-turma"></h3>
+
+    <table class="tabela">
+      <thead>
+        <tr>
+          <th>Aluno</th>
+          <th>Status</th>
+          <th>Observação</th>
+        </tr>
+      </thead>
+      <tbody id="chamada-body"></tbody>
+    </table>
+
+    <button onclick="voltarTurmas()">⬅ Voltar</button>
+
   </div>
+
+</div>
 
   <!-- TURMAS (FUTURO) -->
   <div id="turmas" class="section oculto">
@@ -79,6 +102,7 @@
 <!-- JS -->
 <script src="js/login.js"></script>
 <script src="js/alunos.js"></script>
+<script src="js/chamada.js"></script>
 
 <script>
 /* proteção simples */

@@ -481,6 +481,30 @@ button:hover {
   margin-bottom: 15px;
 }
 
+.grid-turmas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.card-turma {
+  background: rgba(255,255,255,0.95);
+  padding: 15px;
+  border-radius: 12px;
+
+  cursor: pointer;
+  transition: 0.2s;
+
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+}
+
+.card-turma:hover {
+  transform: scale(1.03);
+  background: #f97316;
+  color: white;
+}
+
 /* PRINT */
 @media print {
   body * {

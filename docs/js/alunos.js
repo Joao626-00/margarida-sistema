@@ -250,6 +250,10 @@ function filtrarAlunos() {
 
   renderAlunos(filtrados);
 }
+
+
+
+
 function novoAluno() {
 
   const nome = prompt("Nome do aluno:");
