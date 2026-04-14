@@ -17,7 +17,9 @@ function renderAlunos(lista = alunos) {
 
   div.innerHTML = "";
 
-  lista.forEach((a, i) => {
+  lista.forEach((a) => {
+
+    const indexReal = alunos.indexOf(a);
 
     div.innerHTML += `
       <tr>
@@ -27,11 +29,36 @@ function renderAlunos(lista = alunos) {
         <td>${a.sala}</td>
         <td>${a.status}</td>
         <td>
-          <button onclick="abrirAluno(${i})">Ver</button>
+          <button onclick="abrirAluno(${indexReal})">Ver</button>
+          <button onclick="editarAluno(${indexReal})">Editar</button>
+          <button onclick="excluirAluno(${indexReal})">Excluir</button>
         </td>
       </tr>
     `;
   });
+}
+
+function editarAluno(i) {
+
+  const aluno = alunos[i];
+
+  aluno.nome = prompt("Nome:", aluno.nome) || aluno.nome;
+  aluno.ra = prompt("RA:", aluno.ra) || aluno.ra;
+  aluno.serie = prompt("Série:", aluno.serie) || aluno.serie;
+  aluno.turma = prompt("Turma:", aluno.turma) || aluno.turma;
+  aluno.sala = prompt("Sala:", aluno.sala) || aluno.sala;
+
+  renderAlunos();
+}
+
+function excluirAluno(i) {
+
+  const confirmar = confirm("Deseja excluir este aluno?");
+  if (!confirmar) return;
+
+  alunos.splice(i, 1);
+
+  renderAlunos();
 }
 // ================= ABRIR PRONTUÁRIO =================
 function abrirAluno(i) {
@@ -212,13 +239,17 @@ function filtrarAlunos() {
 
   const termo = document.getElementById("busca").value.toLowerCase();
 
+  if (!termo) {
+    renderAlunos();
+    return;
+  }
+
   const filtrados = alunos.filter(a =>
     a.nome.toLowerCase().includes(termo)
   );
 
   renderAlunos(filtrados);
 }
-
 function novoAluno() {
 
   const nome = prompt("Nome do aluno:");
