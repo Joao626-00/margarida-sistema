@@ -7,11 +7,7 @@ async function login() {
   const msg = document.getElementById("msg");
   const card = document.querySelector(".login-card");
 
-  // segurança
-  if (!user || !pass || !msg || !card) {
-    console.error("Elementos do login não encontrados");
-    return;
-  }
+  if (!user || !pass || !msg || !card) return;
 
   const username = user.value.trim();
   const password = pass.value.trim();
@@ -31,40 +27,29 @@ async function login() {
 
     const data = await res.json();
 
-    // ❌ ERRO DE LOGIN
     if (!res.ok) {
-
-      card.classList.add("error");
       msg.innerText = data.erro || "Usuário ou senha inválidos";
+      card.classList.add("error");
 
-      setTimeout(() => {
-        card.classList.remove("error");
-      }, 900);
-
+      setTimeout(() => card.classList.remove("error"), 900);
       return;
     }
-
-    // ✅ SUCESSO
-    card.classList.add("success");
 
     localStorage.setItem("token", data.token);
     localStorage.setItem("user", JSON.stringify(data.user));
 
     msg.innerText = "Login confirmado ✔";
+    card.classList.add("success");
 
     setTimeout(() => {
       window.location.href = "index.html";
     }, 900);
 
   } catch (err) {
-
     console.error(err);
-
-    card.classList.add("error");
     msg.innerText = "Erro de conexão com servidor";
+    card.classList.add("error");
 
-    setTimeout(() => {
-      card.classList.remove("error");
-    }, 900);
+    setTimeout(() => card.classList.remove("error"), 900);
   }
 }

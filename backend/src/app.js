@@ -14,9 +14,13 @@ app.use(express.json());
 console.log("🔥 APP.JS CARREGADO CORRETAMENTE");
 
 // 🔥 ROTA DE TESTE
-app.get("/teste", (req, res) => {
-    console.log("🔥 TESTE FUNCIONOU");
-    res.json({ ok: true });
+
+
+app.get("/", (req, res) => {
+    res.json({
+        status: "MARGARIDA ONLINE",
+        message: "API rodando corretamente"
+    });
 });
 
 // 🔐 ROTAS
