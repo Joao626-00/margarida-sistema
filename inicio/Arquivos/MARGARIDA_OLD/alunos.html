@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="estilo.css">
+    <title>Document</title>
+</head>
+<body>
+
+    <div class="sidebar">
+    <h2>Margarida</h2>
+    <a href="index.html">Dashboard</a>
+    <a href="alunos.html" class="ativo">Alunos</a>
+    <a href="turmas.html">Turmas</a>
+    <a href="#">Professores</a>
+    <a href="#">Ocorrências</a>
+</div>
+<!-- Conteúdo principal -->
+    <div class="main">
+
+    <div class="header">
+        <h2>Cadastro de Alunos</h2>
+    </div>
+
+    <div class="formulario">
+
+         <!-- FOTO -->
+        <div class="foto-area">
+           <img id="preview" src="" onclick="ampliarImagem()">
+            <input type="file" onchange="carregarImagem(event)">
+        </div>
+        
+
+        <div class="form-grid">
+
+            <input id="nome" type="text" placeholder="Nome">
+            <input id="idade" type="number" placeholder="Idade">
+
+            <input id="cpf" type="text" placeholder="CPF">
+            <input id="ra"   type="text" placeholder="RA">
+
+            <input id="nomeMae" type="text" placeholder="Nome da Mãe">
+            <input id="nomePai" type="text" placeholder="Nome do Pai">
+
+            <input id="telefoneMae" type="text" placeholder="Telefone da Mãe">
+            <input id="telefonePai" type="text" placeholder="Telefone do Pai">
+
+            <input id="email" type="email" placeholder="Email do Aluno">
+
+            <select id="turmaAluno">
+               <option value="">Selecione a Turma</option>
+            </select>
+
+        </div>
+    </div>
+   <button onclick="cadastrarAluno()">Cadastrar</button>
+
+   <div class="table">
+    <h3>Lista de Alunos</h3>
+    <table id="tabelaAlunos">
+        <tr>
+            <th>Nome</th>
+            <th>Idade</th>
+            <th>CPF</th>
+            <th>Ações</th>
+        </tr>
+    </table>
+</div>
+        
+
+</div>
+ <script src="alteracao.js"></script>
+</body>
+</html>

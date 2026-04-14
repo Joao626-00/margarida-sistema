@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Turmas - Margarida</title>
+    <link rel="stylesheet" href="estilo.css">
+</head>
+<body>
+
+<div class="sidebar">
+    <h2>Margarida</h2>
+    <a href="index.html">Dashboard</a>
+    <a href="alunos.html">Alunos</a>
+    <a href="turmas.html" class="ativo">Turmas</a>
+    <a href="professores.html">Professores</a>
+    <a href="ocorrencias.html">Ocorrências</a>
+</div>
+
+<div class="main">
+    <div class="header">
+        <h2>Gestão de Turmas</h2>
+    </div>
+
+    <!-- Formulário de cadastro da turma -->
+    <div class="formulario">
+        <input id="nomeTurma" type="text" placeholder="Nome da Turma">
+        <input id="periodoTurma" type="text" placeholder="Período (ex: Manhã, Tarde)">
+        <input id="salaTurma" type="text" placeholder="Número da Sala">
+        <button onclick="cadastrarTurma()">Cadastrar Turma</button>
+        <div class="filtro-alunos">
+    <input type="text" id="buscarRA" placeholder="Pesquisar por RA/RM">
+    <select id="buscarPeriodo"></select>
+    <button onclick="buscarAlunos()">Buscar</button>
+</div>
+
+<table id="tabelaBuscaAlunos">
+    <!-- A tabela será preenchida pelo JS -->
+</table>
+    </div>
+
+    <!-- Lista de turmas -->
+    <div class="table">
+        <h3>Turmas Cadastradas</h3>
+        <div id="turmas-container"></div>
+    </div>
+</div>
+
+<script src="alteracao.js"></script>
+</body>
+</html>

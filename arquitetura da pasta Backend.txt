@@ -1,0 +1,23 @@
+backend/
+│
+├── server.js
+│
+└── src/
+    ├── app.js
+    │
+    ├── config/
+    │   └── db.js
+    │
+    ├── routes/
+    │   ├── alunoRoutes.js
+    │   └── authRoutes.js
+    │
+    ├── controllers/
+    │   ├── alunoController.js
+    │   └── authController.js
+    │
+    ├── middleware/
+    │   └── authMiddleware.js
+    │
+    └── services/
+        └── alunoService.js   (ou repo)
