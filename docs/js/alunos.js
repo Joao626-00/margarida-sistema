@@ -1,8 +1,7 @@
 let alunos = [
-  { nome: "João Silva", ra: "1001", turma: "A" },
-  { nome: "Maria Souza", ra: "1002", turma: "A" }
+  { nome: "João Silva", ra: "1001", serie: "7º", turma: "A", sala: "22", status: "Ativo" },
+  { nome: "Maria Souza", ra: "1002", serie: "8º", turma: "B", sala: "15", status: "Ativo" }
 ];
-
 let alunoSelecionado = null;
 
 // ================= INICIALIZA =================
@@ -11,25 +10,29 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 // ================= LISTA DE ALUNOS =================
-function renderAlunos() {
+function renderAlunos(lista = alunos) {
 
   const div = document.getElementById("alunos-lista");
   if (!div) return;
 
   div.innerHTML = "";
 
-  alunos.forEach((a, i) => {
+  lista.forEach((a, i) => {
 
     div.innerHTML += `
-      <div class="card" onclick="abrirAluno(${i})">
-        <h3>${a.nome}</h3>
-        <p>${a.ra}</p>
-        <p>${a.turma}</p>
-      </div>
+      <tr>
+        <td>${a.nome}</td>
+        <td>${a.ra}</td>
+        <td>${a.serie}${a.turma}</td>
+        <td>${a.sala}</td>
+        <td>${a.status}</td>
+        <td>
+          <button onclick="abrirAluno(${i})">Ver</button>
+        </td>
+      </tr>
     `;
   });
 }
-
 // ================= ABRIR PRONTUÁRIO =================
 function abrirAluno(i) {
 
@@ -203,3 +206,15 @@ document.addEventListener("change", function (e) {
     reader.readAsDataURL(file);
   }
 });
+
+
+function filtrarAlunos() {
+
+  const termo = document.getElementById("busca").value.toLowerCase();
+
+  const filtrados = alunos.filter(a =>
+    a.nome.toLowerCase().includes(termo)
+  );
+
+  renderAlunos(filtrados);
+}

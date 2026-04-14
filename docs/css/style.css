@@ -408,6 +408,52 @@ button:hover {
   transform: scale(1.05);
 }
 
+/* ===== TABELA DE ALUNOS ===== */
+
+.tabela {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+
+  background: rgba(255,255,255,0.95);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+/* CABEÇALHO */
+.tabela thead {
+  background: #0f172a;
+  color: white;
+}
+
+.tabela th {
+  padding: 12px;
+  text-align: left;
+  font-size: 14px;
+}
+
+/* LINHAS */
+.tabela td {
+  padding: 10px;
+  font-size: 14px;
+  border-bottom: 1px solid #eee;
+}
+
+/* HOVER */
+.tabela tbody tr:hover {
+  background: #f1f5f9;
+}
+
+/* BOTÃO NA TABELA */
+.tabela button {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.tabela {
+  box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
 /* PRINT */
 @media print {
   body * {
