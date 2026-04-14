@@ -218,3 +218,25 @@ function filtrarAlunos() {
 
   renderAlunos(filtrados);
 }
+
+function novoAluno() {
+
+  const nome = prompt("Nome do aluno:");
+  if (!nome) return;
+
+  const ra = prompt("RA:");
+  const serie = prompt("Série (ex: 7º):");
+  const turma = prompt("Turma (ex: A):");
+  const sala = prompt("Sala:");
+
+  alunos.push({
+    nome,
+    ra,
+    serie,
+    turma,
+    sala,
+    status: "Ativo"
+  });
+
+  renderAlunos();
+}

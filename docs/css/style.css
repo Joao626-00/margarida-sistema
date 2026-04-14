@@ -474,6 +474,12 @@ button:hover {
   background: transparent;
 }
 
+.topo-alunos {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
 
 /* PRINT */
 @media print {
