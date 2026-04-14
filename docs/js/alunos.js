@@ -1,7 +1,8 @@
 let alunos = [
-  { nome: "João Silva", ra: "1001", serie: "7º", turma: "A", sala: "22", status: "Ativo" },
-  { nome: "Maria Souza", ra: "1002", serie: "8º", turma: "B", sala: "15", status: "Ativo" }
+  { nome: "João Silva", ra: "1001", serie: "7º", turma: "3A", sala: "22", status: "Ativo" },
+  { nome: "Maria Souza", ra: "1002", serie: "8º", turma: "3B", sala: "15", status: "Ativo" }
 ];
+
 let alunoSelecionado = null;
 
 // ================= INICIALIZA =================
@@ -9,7 +10,7 @@ document.addEventListener("DOMContentLoaded", () => {
   renderAlunos();
 });
 
-// ================= LISTA DE ALUNOS =================
+// ================= LISTA =================
 function renderAlunos(lista = alunos) {
 
   const div = document.getElementById("alunos-lista");
@@ -38,28 +39,57 @@ function renderAlunos(lista = alunos) {
   });
 }
 
+// ================= EDITAR =================
 function editarAluno(i) {
 
   const aluno = alunos[i];
 
   aluno.nome = prompt("Nome:", aluno.nome) || aluno.nome;
   aluno.ra = prompt("RA:", aluno.ra) || aluno.ra;
+
   aluno.serie = prompt("Série:", aluno.serie) || aluno.serie;
-  aluno.turma = prompt("Turma:", aluno.turma) || aluno.turma;
+
+  aluno.turma = (prompt("Turma (ex: 3A):", aluno.turma) || aluno.turma)
+    .trim()
+    .toUpperCase();
+
   aluno.sala = prompt("Sala:", aluno.sala) || aluno.sala;
 
   renderAlunos();
 }
 
+// ================= EXCLUIR =================
 function excluirAluno(i) {
 
-  const confirmar = confirm("Deseja excluir este aluno?");
-  if (!confirmar) return;
+  if (!confirm("Deseja excluir este aluno?")) return;
 
   alunos.splice(i, 1);
+  renderAlunos();
+}
+
+// ================= NOVO =================
+function novoAluno() {
+
+  const nome = prompt("Nome do aluno:");
+  if (!nome) return;
+
+  const ra = prompt("RA:");
+  const serie = prompt("Série:");
+  const turma = prompt("Turma (ex: 3A):");
+  const sala = prompt("Sala:");
+
+  alunos.push({
+    nome,
+    ra,
+    serie,
+    turma: turma.trim().toUpperCase(),
+    sala,
+    status: "Ativo"
+  });
 
   renderAlunos();
 }
+
 // ================= ABRIR PRONTUÁRIO =================
 function abrirAluno(i) {
 
@@ -68,55 +98,45 @@ function abrirAluno(i) {
   const a = alunos[i];
   const card = document.getElementById("card-aluno");
 
+  if (!card) return;
+
   card.innerHTML = `
     <div class="prontuario">
 
-     <!-- FOTO -->
-<div class="foto-area">
-  <img id="fotoAluno"
-       src="${a.foto || 'https://via.placeholder.com/150'}"
-       onclick="zoomAlunoFoto()">
+      <div class="foto-area">
+        <img id="fotoAluno"
+             src="${a.foto || 'https://via.placeholder.com/150'}"
+             onclick="zoomAlunoFoto()">
 
-  <div class="upload-box">
-    <input type="file" id="uploadAlunoFoto" hidden>
+        <div class="upload-box">
+          <input type="file" id="uploadAlunoFoto" hidden>
+          <button onclick="document.getElementById('uploadAlunoFoto').click()">
+            📷 Foto
+          </button>
+        </div>
+      </div>
 
-    <button type="button"
-      onclick="document.getElementById('uploadAlunoFoto').click()">
-      📷 Foto
-    </button>
-  </div>
-</div>
-
-      <!-- DADOS -->
       <div class="dados">
-        <input value="${a.nome}" disabled>
-        <input value="${a.ra}" disabled>
-        <input value="${a.turma}" disabled>
+       <input value="${a.nome}" disabled class="input-bloqueado">
+<input value="${a.ra}" disabled class="input-bloqueado">
+<input value="${a.turma}" disabled class="input-bloqueado">
 
         <input id="responsavelAluno" placeholder="Responsável" value="${a.responsavel || ''}">
         <input id="telefoneAluno" placeholder="Telefone" value="${a.telefone || ''}">
         <input placeholder="Pai">
         <input placeholder="Mãe">
-      </div>
 
-      <!-- FREQUÊNCIA -->
-      <div class="frequencia">
-        <h3>📌 Frequência</h3>
-
-        <button onclick="setFreq('✔ Presente')">✔ Presente</button>
-        <button onclick="setFreq('❌ Falta')">❌ Falta</button>
-
-        <p id="freq">${a.freq || 'Sem registro'}</p>
-      </div>
-
-      <!-- OBSERVAÇÃO -->
-      <div class="obs">
         <textarea id="obsAluno" placeholder="Observações">${a.obs || ''}</textarea>
       </div>
 
-      <!-- AÇÕES -->
+      <div class="frequencia">
+        <h3>📌 Frequência</h3>
+        <button onclick="setFreq('✔ Presente')">✔ Presente</button>
+        <button onclick="setFreq('❌ Falta')">❌ Falta</button>
+        <p id="freq">${a.freq || 'Sem registro'}</p>
+      </div>
+
       <div class="acoes">
-        <button onclick="salvarAluno()">💾 Salvar</button>
         <button onclick="window.print()">🖨 Imprimir</button>
         <button onclick="exportarWord()">📄 Word</button>
         <button onclick="fecharCard()">Fechar</button>
@@ -126,45 +146,48 @@ function abrirAluno(i) {
   `;
 
   card.classList.remove("oculto");
+
+  // 🔥 auto-save ao perder foco
+  setTimeout(() => {
+    document.querySelectorAll("#card-aluno input, #card-aluno textarea")
+      .forEach(el => {
+        el.addEventListener("blur", autoSalvarAluno);
+      });
+  }, 100);
 }
 
-// ================= FREQUÊNCIA =================
-function setFreq(v) {
-
-  const card = document.getElementById("card-aluno");
-  const freq = card.querySelector("#freq");
-
-  if (freq) freq.innerText = v;
-
-  if (alunoSelecionado) {
-    alunoSelecionado.freq = v;
-  }
-}
-
-// ================= SALVAR ALUNO =================
-function salvarAluno() {
+// ================= AUTO SALVAR =================
+function autoSalvarAluno() {
 
   if (!alunoSelecionado) return;
 
-  alunoSelecionado.responsavel = document.getElementById("responsavelAluno").value;
-  alunoSelecionado.telefone = document.getElementById("telefoneAluno").value;
-  alunoSelecionado.obs = document.getElementById("obsAluno").value;
+  alunoSelecionado.responsavel =
+    document.getElementById("responsavelAluno")?.value || "";
 
-  alert("✔ Dados salvos com sucesso");
+  alunoSelecionado.telefone =
+    document.getElementById("telefoneAluno")?.value || "";
+
+  alunoSelecionado.obs =
+    document.getElementById("obsAluno")?.value || "";
 }
 
 // ================= FECHAR =================
 function fecharCard() {
-  document.getElementById("card-aluno").classList.add("oculto");
+  const card = document.getElementById("card-aluno");
+  if (!card) return;
+
+  card.classList.add("oculto");
+  card.innerHTML = "";
 }
 
-// ================= EXPORT WORD =================
+// ================= WORD =================
 function exportarWord() {
 
-  const aluno = document.getElementById("card-aluno").cloneNode(true);
+  const card = document.getElementById("card-aluno");
+  if (!card) return;
 
-  // remove botões antes de exportar
-  aluno.querySelectorAll("button").forEach(btn => btn.remove());
+  const clone = card.cloneNode(true);
+  clone.querySelectorAll("button").forEach(b => b.remove());
 
   const html = `
     <html>
@@ -172,45 +195,56 @@ function exportarWord() {
       <meta charset="utf-8">
       <title>Prontuário</title>
     </head>
-    <body>
-      ${aluno.innerHTML}
-    </body>
+    <body>${clone.innerHTML}</body>
     </html>
   `;
 
-  const blob = new Blob([html], {
-    type: "application/msword"
-  });
+  const blob = new Blob([html], { type: "application/msword" });
 
   const link = document.createElement("a");
   link.href = URL.createObjectURL(blob);
   link.download = "prontuario.doc";
 
+  document.body.appendChild(link);
   link.click();
+  document.body.removeChild(link);
 }
 
-// ================= ZOOM FOTO =================
+// ================= ZOOM =================
 function zoomAlunoFoto() {
 
-  const img = document.getElementById("fotoAluno").src;
+  const img = document.querySelector("#card-aluno #fotoAluno");
+  if (!img) return;
 
   const zoom = document.createElement("div");
   zoom.className = "zoom";
 
   zoom.innerHTML = `
-    <img src="${img}" id="zoomImg">
+    <img src="${img.src}">
   `;
 
-  // fecha clicando no fundo
-  zoom.addEventListener("click", (e) => {
-    if (e.target === zoom) {
-      zoom.remove();
-    }
-  });
+  zoom.addEventListener("click", () => zoom.remove());
 
   document.body.appendChild(zoom);
 }
-// ================= UPLOAD FOTO (CORRIGIDO GLOBAL) =================
+
+// ================= FREQUÊNCIA =================
+function setFreq(v) {
+
+  const el = document.getElementById("freq");
+  if (el) el.innerText = v;
+
+  if (alunoSelecionado) {
+    alunoSelecionado.freq = v;
+  }
+}
+function calcularFrequencia(aluno) {
+  const total = aluno.presencas?.length || 0;
+  const presentes = aluno.presencas?.filter(p => p === "Presente").length || 0;
+
+  return total ? Math.round((presentes / total) * 100) : 0;
+}
+
 document.addEventListener("change", function (e) {
 
   if (e.target && e.target.id === "uploadAlunoFoto") {
@@ -223,7 +257,10 @@ document.addEventListener("change", function (e) {
     reader.onload = function () {
 
       const img = document.getElementById("fotoAluno");
-      if (img) img.src = reader.result;
+
+      if (img) {
+        img.src = reader.result;
+      }
 
       if (alunoSelecionado) {
         alunoSelecionado.foto = reader.result;
@@ -233,45 +270,3 @@ document.addEventListener("change", function (e) {
     reader.readAsDataURL(file);
   }
 });
-
-
-function filtrarAlunos() {
-
-  const termo = document.getElementById("busca").value.toLowerCase();
-
-  if (!termo) {
-    renderAlunos();
-    return;
-  }
-
-  const filtrados = alunos.filter(a =>
-    a.nome.toLowerCase().includes(termo)
-  );
-
-  renderAlunos(filtrados);
-}
-
-
-
-
-function novoAluno() {
-
-  const nome = prompt("Nome do aluno:");
-  if (!nome) return;
-
-  const ra = prompt("RA:");
-  const serie = prompt("Série (ex: 7º):");
-  const turma = prompt("Turma (ex: A):");
-  const sala = prompt("Sala:");
-
-  alunos.push({
-    nome,
-    ra,
-    serie,
-    turma,
-    sala,
-    status: "Ativo"
-  });
-
-  renderAlunos();
-}

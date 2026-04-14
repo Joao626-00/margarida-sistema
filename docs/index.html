@@ -27,68 +27,72 @@
 <!-- CONTEÚDO -->
 <div class="content">
 
-  <!-- ALUNOS -->
-<div id="alunos" class="section">
-  <h2>Lista de Alunos</h2>
+  <!-- ================= ALUNOS ================= -->
+  <div id="alunos" class="section">
 
-<div class="topo-alunos">
+    <h2>Lista de Alunos</h2>
 
-  <div class="busca-box">
-    🔍
-    <input type="text" id="busca" placeholder="Buscar aluno..." onkeyup="filtrarAlunos()">
-  </div>
+    <div class="topo-alunos">
 
-  <button onclick="novoAluno()">+ Novo</button>
+      <div class="busca-box">
+        🔍
+        <input type="text" id="busca" placeholder="Buscar aluno..." onkeyup="filtrarAlunos()">
+      </div>
 
-</div>
+      <button onclick="novoAluno()">+ Novo</button>
 
-  <table class="tabela">
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>RA</th>
-        <th>Turma</th>
-        <th>Sala</th>
-        <th>Status</th>
-        <th>Ações</th>
-      </tr>
-    </thead>
-
-    <tbody id="alunos-lista"></tbody>
-  </table>
-</div>
-
-  <!-- CHAMADA -->
-  <div id="chamada" class="section oculto">
-
-  <h2>📌 Chamada</h2>
-
-  <!-- LISTA DE TURMAS -->
-  <div id="lista-turmas" class="grid-turmas"></div>
-
-  <!-- TELA DA CHAMADA (OCULTA) -->
-  <div id="chamada-turma" class="oculto">
-
-    <h3 id="titulo-turma"></h3>
+    </div>
 
     <table class="tabela">
       <thead>
         <tr>
-          <th>Aluno</th>
+          <th>Nome</th>
+          <th>RA</th>
+          <th>Turma</th>
+          <th>Sala</th>
           <th>Status</th>
-          <th>Observação</th>
+          <th>Ações</th>
         </tr>
       </thead>
-      <tbody id="chamada-body"></tbody>
-    </table>
 
-    <button onclick="voltarTurmas()">⬅ Voltar</button>
+      <tbody id="alunos-lista"></tbody>
+    </table>
 
   </div>
 
-</div>
+  <!-- ================= CHAMADA ================= -->
+  <div id="chamada" class="section oculto">
 
-  <!-- TURMAS (FUTURO) -->
+    <h2>📌 Chamada</h2>
+
+    <!-- LISTA DE TURMAS -->
+    <div id="lista-turmas" class="grid-turmas"></div>
+
+    <!-- CHAMADA DA TURMA -->
+    <div id="chamada-turma" class="oculto">
+
+      <h3 id="titulo-turma"></h3>
+
+      <table class="tabela">
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>Status</th>
+            <th>Observação</th>
+          </tr>
+        </thead>
+
+        <tbody id="chamada-body"></tbody>
+      </table>
+
+      <button onclick="salvarChamada()">💾 Salvar Chamada</button>
+      <button onclick="voltarTurmas()">⬅ Voltar</button>
+
+    </div>
+
+  </div>
+
+  <!-- ================= TURMAS ================= -->
   <div id="turmas" class="section oculto">
     <h2>Turmas</h2>
     <p>Em construção...</p>
@@ -96,31 +100,36 @@
 
 </div>
 
-<!-- PRONTUÁRIO (CARD FLUTUANTE) -->
+<!-- PRONTUÁRIO -->
 <div id="card-aluno" class="card-aluno oculto"></div>
 
-<!-- JS -->
-<script src="js/login.js"></script>
+<!-- ================= JS ================= -->
+
 <script src="js/alunos.js"></script>
 <script src="js/chamada.js"></script>
 
 <script>
-/* proteção simples */
+
+/* ================= PROTEÇÃO LOGIN ================= */
 if (!localStorage.getItem("token")) {
   window.location.href = "login.html";
 }
 
+/* ================= SAIR ================= */
 function sair() {
   localStorage.clear();
   window.location.href = "login.html";
 }
 
+/* ================= NAVEGAÇÃO ================= */
 function abrirAba(id) {
 
-  document.querySelectorAll(".section").forEach(s => s.classList.add("oculto"));
-  document.getElementById(id).classList.remove("oculto");
+  document.querySelectorAll(".section")
+    .forEach(s => s.classList.add("oculto"));
 
+  document.getElementById(id).classList.remove("oculto");
 }
+
 </script>
 
 </body>
