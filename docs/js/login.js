@@ -1,55 +1,43 @@
-const API = "https://margarida-api.onrender.com";
+function login() {
 
-async function login() {
+  const user = document.getElementById("usuario").value;
+  const senha = document.getElementById("senha").value;
+  const botao = document.querySelector("button");
 
-  const user = document.getElementById("user");
-  const pass = document.getElementById("pass");
-  const msg = document.getElementById("msg");
-  const card = document.querySelector(".login-card");
-
-  if (!user || !pass || !msg || !card) return;
-
-  const username = user.value.trim();
-  const password = pass.value.trim();
-
-  if (!username || !password) {
-    msg.innerText = "Preencha todos os campos";
+  if (!user || !senha) {
+    alert("Preencha usuário e senha");
     return;
   }
 
-  try {
+  botao.innerText = "Entrando...";
+  botao.disabled = true;
 
-    const res = await fetch(`${API}/auth/login`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
+  // 🔥 REMOVI O DELAY (era o que deixava lento)
+  
+  if (user === "admin" && senha === "123") {
 
-    const data = await res.json();
+    localStorage.setItem("auth", JSON.stringify({
+      logado: true,
+      role: "coordenadora"
+    }));
 
-    if (!res.ok) {
-      msg.innerText = data.erro || "Usuário ou senha inválidos";
-      card.classList.add("error");
-
-      setTimeout(() => card.classList.remove("error"), 900);
-      return;
-    }
-
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-
-    msg.innerText = "Login confirmado ✔";
-    card.classList.add("success");
-
-    setTimeout(() => {
-      window.location.href = "index.html";
-    }, 900);
-
-  } catch (err) {
-    console.error(err);
-    msg.innerText = "Erro de conexão com servidor";
-    card.classList.add("error");
-
-    setTimeout(() => card.classList.remove("error"), 900);
+    window.location.replace("index.html"); // mais rápido que href
+    return;
   }
+
+  if (user === "prof" && senha === "123") {
+
+    localStorage.setItem("auth", JSON.stringify({
+      logado: true,
+      role: "professor"
+    }));
+
+    window.location.replace("index.html");
+    return;
+  }
+
+  alert("Login inválido");
+
+  botao.innerText = "Entrar";
+  botao.disabled = false;
 }

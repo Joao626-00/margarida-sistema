@@ -9,11 +9,15 @@ module.exports = (req, res, next) => {
 
     const token = authHeader.replace("Bearer ", "");
 
+    if (!token) {
+        return res.status(401).json({ erro: "Token inválido" });
+    }
+
     try {
         const decoded = jwt.verify(token, "SEGREDO_SUPER_SEGURO");
         req.user = decoded;
         next();
     } catch (err) {
-        return res.status(401).json({ erro: "Token inválido" });
+        return res.status(401).json({ erro: "Token inválido ou expirado" });
     }
 };

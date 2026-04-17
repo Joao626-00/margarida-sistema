@@ -1,272 +1,304 @@
-let alunos = [
-  { nome: "João Silva", ra: "1001", serie: "7º", turma: "3A", sala: "22", status: "Ativo" },
-  { nome: "Maria Souza", ra: "1002", serie: "8º", turma: "3B", sala: "15", status: "Ativo" }
-];
+console.log("ALUNOS MODULE ON");
 
-let alunoSelecionado = null;
+// =====================
+// ESTADO GLOBAL SEGURO
+// =====================
 
-// ================= INICIALIZA =================
-document.addEventListener("DOMContentLoaded", () => {
-  renderAlunos();
-});
+window.APP = window.APP || {
+  alunos: [],
+  turmas: []
+};
 
-// ================= LISTA =================
-function renderAlunos(lista = alunos) {
+window.API = window.API || "http://localhost:3000";
 
-  const div = document.getElementById("alunos-lista");
-  if (!div) return;
+let alunosCache = [];
+let alunoEditando = null;
 
-  div.innerHTML = "";
+// =====================
+// FETCH SEGURO
+// =====================
 
-  lista.forEach((a) => {
+async function fetchAlunos() {
+  try {
+    const res = await fetch(`${window.API}/alunos`);
 
-    const indexReal = alunos.indexOf(a);
+    if (!res.ok) {
+      throw new Error("Erro HTTP: " + res.status);
+    }
 
-    div.innerHTML += `
+    const data = await res.json();
+
+    const alunos = data.dados || [];
+
+    alunosCache = alunos;
+    window.APP.alunos = alunos;
+
+    return alunos;
+
+  } catch (err) {
+    console.error("Erro fetch alunos:", err);
+    return [];
+  }
+}
+
+// =====================
+// RENDER
+// =====================
+
+async function renderAlunos() {
+  const tbody = document.getElementById("alunos-lista");
+  if (!tbody) return;
+
+  const lista = await fetchAlunos();
+
+  tbody.innerHTML = "";
+
+  lista.forEach(a => {
+    tbody.innerHTML += `
       <tr>
-        <td>${a.nome}</td>
-        <td>${a.ra}</td>
-        <td>${a.serie}${a.turma}</td>
-        <td>${a.sala}</td>
-        <td>${a.status}</td>
+        <td>${a.nome || "-"}</td>
+        <td>${a.serie || "-"}</td>
+        <td>${a.turma || "-"}</td>
+        <td>${a.sala || "-"}</td>
+        <td>${a.status || "Ativo"}</td>
         <td>
-          <button onclick="abrirAluno(${indexReal})">Ver</button>
-          <button onclick="editarAluno(${indexReal})">Editar</button>
-          <button onclick="excluirAluno(${indexReal})">Excluir</button>
+          <button onclick="abrirAluno(${a.id})">Ver</button>
+          <button onclick="editarAluno(${a.id})">Editar</button>
+          <button onclick="excluirAluno(${a.id})">Excluir</button>
         </td>
       </tr>
     `;
   });
 }
 
-// ================= EDITAR =================
-function editarAluno(i) {
+// =====================
+// INIT (CRÍTICO)
+// =====================
 
-  const aluno = alunos[i];
+document.addEventListener("DOMContentLoaded", () => {
+  setTimeout(() => {
+    renderAlunos();
+  }, 50);
+});
 
-  aluno.nome = prompt("Nome:", aluno.nome) || aluno.nome;
-  aluno.ra = prompt("RA:", aluno.ra) || aluno.ra;
+// =====================
+// MODAL
+// =====================
 
-  aluno.serie = prompt("Série:", aluno.serie) || aluno.serie;
-
-  aluno.turma = (prompt("Turma (ex: 3A):", aluno.turma) || aluno.turma)
-    .trim()
-    .toUpperCase();
-
-  aluno.sala = prompt("Sala:", aluno.sala) || aluno.sala;
-
-  renderAlunos();
-}
-
-// ================= EXCLUIR =================
-function excluirAluno(i) {
-
-  if (!confirm("Deseja excluir este aluno?")) return;
-
-  alunos.splice(i, 1);
-  renderAlunos();
-}
-
-// ================= NOVO =================
 function novoAluno() {
+  alunoEditando = null;
+  abrirModalAluno({});
+}
 
-  const nome = prompt("Nome do aluno:");
-  if (!nome) return;
+function abrirModalAluno(aluno = {}) {
+  const modal = document.getElementById("modal-aluno");
+  if (!modal) return;
 
-  const ra = prompt("RA:");
-  const serie = prompt("Série:");
-  const turma = prompt("Turma (ex: 3A):");
-  const sala = prompt("Sala:");
+  modal.classList.remove("oculto");
 
-  alunos.push({
-    nome,
-    ra,
-    serie,
-    turma: turma.trim().toUpperCase(),
-    sala,
-    status: "Ativo"
+  document.getElementById("aluno-nome").value = aluno.nome || "";
+  document.getElementById("aluno-ra").value = aluno.ra || "";
+  document.getElementById("aluno-email").value = aluno.email || "";
+  document.getElementById("aluno-status").value = aluno.status || "Ativo";
+  document.getElementById("aluno-turma").value = aluno.turma || "";
+  document.getElementById("aluno-serie").value = aluno.serie || "";
+  document.getElementById("aluno-sala").value = aluno.sala || "";
+}
+
+// =====================
+// FECHAR MODAL
+// =====================
+
+function fecharModalAluno() {
+  const modal = document.getElementById("modal-aluno");
+  if (!modal) return;
+
+  modal.classList.add("oculto");
+
+  modal.querySelectorAll("input").forEach(i => i.value = "");
+}
+
+// =====================
+// SALVAR
+// =====================
+
+async function salvarAluno() {
+  const payload = {
+    nome: document.getElementById("aluno-nome").value,
+    ra: document.getElementById("aluno-ra").value,
+    email: document.getElementById("aluno-email").value,
+    status: document.getElementById("aluno-status").value,
+    turma: document.getElementById("aluno-turma").value,
+    serie: document.getElementById("aluno-serie").value,
+    sala: document.getElementById("aluno-sala").value
+  };
+
+  const url = alunoEditando
+    ? `${window.API}/alunos/${alunoEditando}`
+    : `${window.API}/alunos`;
+
+  const method = alunoEditando ? "PUT" : "POST";
+
+  await fetch(url, {
+    method,
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  alunoEditando = null;
+
+  fecharModalAluno();
+  renderAlunos();
+}
+
+// =====================
+// PRONTUÁRIO (FUNCIONAL E LIMPO)
+// =====================
+
+function abrirAluno(id) {
+  const aluno = window.APP.alunos.find(a => a.id == id);
+  if (!aluno) return;
+
+  const card = document.getElementById("card-aluno");
+
+  card.innerHTML = `
+    <div class="prontuario-overlay" onclick="fecharCard()">
+      <div class="prontuario-modal" onclick="event.stopPropagation()">
+
+        <div class="prontuario-header">
+          <div>
+            <h2>📘 Prontuário</h2>
+            <small>ID: ${aluno.id}</small>
+          </div>
+
+          <button class="btn-fechar" onclick="fecharCard()">✖</button>
+        </div>
+
+        <div class="prontuario-body">
+
+          <div class="foto-section">
+            <div class="foto-box">
+              ${aluno.foto
+                ? `<img src="${aluno.foto}" class="foto-aluno">`
+                : `<div class="foto-placeholder">📷</div>`
+              }
+            </div>
+
+            <button onclick="baixarFoto('${aluno.foto || ''}')">
+              Download Foto
+            </button>
+          </div>
+
+          <div class="dados-section">
+            <p><b>Nome:</b> ${aluno.nome}</p>
+            <p><b>RA:</b> ${aluno.ra}</p>
+            <p><b>Turma:</b> ${aluno.turma}</p>
+            <p><b>Sala:</b> ${aluno.sala}</p>
+            <p><b>Email:</b> ${aluno.email}</p>
+          </div>
+
+        </div>
+
+        <div class="prontuario-actions">
+
+          <button onclick="editarAluno(${aluno.id})">Editar</button>
+
+          <button onclick="imprimirProntuario()">
+            Imprimir
+          </button>
+
+          <button onclick="exportarWord()">
+            Word
+          </button>
+
+          <button onclick="fecharCard()">
+            Fechar
+          </button>
+
+        </div>
+
+      </div>
+    </div>
+  `;
+
+  card.classList.remove("oculto");
+}
+
+// FECHAR
+function fecharCard() {
+  document.getElementById("card-aluno")?.classList.add("oculto");
+}
+
+// PRINT
+function imprimirProntuario() {
+  window.print();
+}
+
+// WORD EXPORT (SIMPLE SAAS VERSION)
+function exportarWord() {
+  const conteudo = document.querySelector(".prontuario-modal").innerHTML;
+
+  const blob = new Blob([`
+    <html>
+      <body>${conteudo}</body>
+    </html>
+  `], { type: "application/msword" });
+
+  const link = document.createElement("a");
+  link.href = URL.createObjectURL(blob);
+  link.download = "prontuario.doc";
+  link.click();
+}
+
+// FOTO
+function baixarFoto(src) {
+  if (!src) return;
+  const a = document.createElement("a");
+  a.href = src;
+  a.download = "aluno.jpg";
+  a.click();
+}
+// =====================
+// FECHAR CARD
+// =====================
+
+function fecharCard() {
+  document.getElementById("card-aluno")?.classList.add("oculto");
+}
+
+// =====================
+// EDITAR / EXCLUIR
+// =====================
+
+function editarAluno(id) {
+  const aluno = alunosCache.find(a => a.id == id);
+  if (!aluno) return;
+
+  alunoEditando = id;
+  abrirModalAluno(aluno);
+}
+
+async function excluirAluno(id) {
+  if (!confirm("Excluir aluno?")) return;
+
+  await fetch(`${window.API}/alunos/${id}`, {
+    method: "DELETE"
   });
 
   renderAlunos();
 }
 
-// ================= ABRIR PRONTUÁRIO =================
-function abrirAluno(i) {
+// =====================
+// EXPORT GLOBAL (IMPORTANTE)
+// =====================
 
-  alunoSelecionado = alunos[i];
-
-  const a = alunos[i];
-  const card = document.getElementById("card-aluno");
-
-  if (!card) return;
-
-  card.innerHTML = `
-    <div class="prontuario">
-
-      <div class="foto-area">
-        <img id="fotoAluno"
-             src="${a.foto || 'https://via.placeholder.com/150'}"
-             onclick="zoomAlunoFoto()">
-
-        <div class="upload-box">
-          <input type="file" id="uploadAlunoFoto" hidden>
-          <button onclick="document.getElementById('uploadAlunoFoto').click()">
-            📷 Foto
-          </button>
-        </div>
-      </div>
-
-      <div class="dados">
-       <input value="${a.nome}" disabled class="input-bloqueado">
-<input value="${a.ra}" disabled class="input-bloqueado">
-<input value="${a.turma}" disabled class="input-bloqueado">
-
-        <input id="responsavelAluno" placeholder="Responsável" value="${a.responsavel || ''}">
-        <input id="telefoneAluno" placeholder="Telefone" value="${a.telefone || ''}">
-        <input placeholder="Pai">
-        <input placeholder="Mãe">
-
-        <textarea id="obsAluno" placeholder="Observações">${a.obs || ''}</textarea>
-      </div>
-
-      <div class="frequencia">
-        <h3>📌 Frequência</h3>
-        <button onclick="setFreq('✔ Presente')">✔ Presente</button>
-        <button onclick="setFreq('❌ Falta')">❌ Falta</button>
-        <p id="freq">${a.freq || 'Sem registro'}</p>
-      </div>
-
-      <div class="acoes">
-        <button onclick="window.print()">🖨 Imprimir</button>
-        <button onclick="exportarWord()">📄 Word</button>
-        <button onclick="fecharCard()">Fechar</button>
-      </div>
-
-    </div>
-  `;
-
-  card.classList.remove("oculto");
-
-  // 🔥 auto-save ao perder foco
-  setTimeout(() => {
-    document.querySelectorAll("#card-aluno input, #card-aluno textarea")
-      .forEach(el => {
-        el.addEventListener("blur", autoSalvarAluno);
-      });
-  }, 100);
-}
-
-// ================= AUTO SALVAR =================
-function autoSalvarAluno() {
-
-  if (!alunoSelecionado) return;
-
-  alunoSelecionado.responsavel =
-    document.getElementById("responsavelAluno")?.value || "";
-
-  alunoSelecionado.telefone =
-    document.getElementById("telefoneAluno")?.value || "";
-
-  alunoSelecionado.obs =
-    document.getElementById("obsAluno")?.value || "";
-}
-
-// ================= FECHAR =================
-function fecharCard() {
-  const card = document.getElementById("card-aluno");
-  if (!card) return;
-
-  card.classList.add("oculto");
-  card.innerHTML = "";
-}
-
-// ================= WORD =================
-function exportarWord() {
-
-  const card = document.getElementById("card-aluno");
-  if (!card) return;
-
-  const clone = card.cloneNode(true);
-  clone.querySelectorAll("button").forEach(b => b.remove());
-
-  const html = `
-    <html>
-    <head>
-      <meta charset="utf-8">
-      <title>Prontuário</title>
-    </head>
-    <body>${clone.innerHTML}</body>
-    </html>
-  `;
-
-  const blob = new Blob([html], { type: "application/msword" });
-
-  const link = document.createElement("a");
-  link.href = URL.createObjectURL(blob);
-  link.download = "prontuario.doc";
-
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
-}
-
-// ================= ZOOM =================
-function zoomAlunoFoto() {
-
-  const img = document.querySelector("#card-aluno #fotoAluno");
-  if (!img) return;
-
-  const zoom = document.createElement("div");
-  zoom.className = "zoom";
-
-  zoom.innerHTML = `
-    <img src="${img.src}">
-  `;
-
-  zoom.addEventListener("click", () => zoom.remove());
-
-  document.body.appendChild(zoom);
-}
-
-// ================= FREQUÊNCIA =================
-function setFreq(v) {
-
-  const el = document.getElementById("freq");
-  if (el) el.innerText = v;
-
-  if (alunoSelecionado) {
-    alunoSelecionado.freq = v;
-  }
-}
-function calcularFrequencia(aluno) {
-  const total = aluno.presencas?.length || 0;
-  const presentes = aluno.presencas?.filter(p => p === "Presente").length || 0;
-
-  return total ? Math.round((presentes / total) * 100) : 0;
-}
-
-document.addEventListener("change", function (e) {
-
-  if (e.target && e.target.id === "uploadAlunoFoto") {
-
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-
-    reader.onload = function () {
-
-      const img = document.getElementById("fotoAluno");
-
-      if (img) {
-        img.src = reader.result;
-      }
-
-      if (alunoSelecionado) {
-        alunoSelecionado.foto = reader.result;
-      }
-    };
-
-    reader.readAsDataURL(file);
-  }
-});
+window.novoAluno = novoAluno;
+window.abrirAluno = abrirAluno;
+window.editarAluno = editarAluno;
+window.excluirAluno = excluirAluno;
+window.salvarAluno = salvarAluno;
+window.fecharModalAluno = fecharModalAluno;
+window.fecharCard = fecharCard;
+window.imprimirProntuario = imprimirProntuario;
+window.exportarWord = exportarWord;
+window.baixarFoto = baixarFoto;

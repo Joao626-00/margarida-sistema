@@ -1,136 +1,121 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-
 <head>
   <meta charset="UTF-8">
-  <title>MARGARIDA - Sistema</title>
+  <title>MARGARIDA</title>
   <link rel="stylesheet" href="css/style.css">
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div class="sidebar">
+<div class="app">
 
-  <h2>🦉 MARGARIDA</h2>
+  <aside class="sidebar">
+    <h2>🦉 MARGARIDA</h2>
 
-  <button onclick="abrirAba('alunos')">📋 Alunos</button>
-  <button onclick="abrirAba('chamada')">📌 Chamada</button>
-  <button onclick="abrirAba('turmas')">🏫 Turmas</button>
+    <button onclick="abrirAba('alunos')">📋 Alunos</button>
+    <button onclick="abrirAba('chamada')">📌 Chamada</button>
+    <button onclick="abrirAba('turmas')">🏫 Turmas</button>
 
-  <hr>
+    <hr>
 
-  <button onclick="sair()">🚪 Sair</button>
+    <button onclick="sair()">Sair</button>
+  </aside>
 
-</div>
+  <main class="content">
 
-<!-- CONTEÚDO -->
-<div class="content">
+    <section id="alunos" class="section">
+      <h2>Alunos</h2>
 
-  <!-- ================= ALUNOS ================= -->
-  <div id="alunos" class="section">
-
-    <h2>Lista de Alunos</h2>
-
-    <div class="topo-alunos">
-
-      <div class="busca-box">
-        🔍
-        <input type="text" id="busca" placeholder="Buscar aluno..." onkeyup="filtrarAlunos()">
+      <div class="topbar">
+        <input id="buscaAluno" placeholder="Buscar aluno...">
+        <button onclick="novoAluno()">+ Novo</button>
       </div>
 
-      <button onclick="novoAluno()">+ Novo</button>
-
-    </div>
-
-    <table class="tabela">
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>RA</th>
-          <th>Turma</th>
-          <th>Sala</th>
-          <th>Status</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-
-      <tbody id="alunos-lista"></tbody>
-    </table>
-
-  </div>
-
-  <!-- ================= CHAMADA ================= -->
-  <div id="chamada" class="section oculto">
-
-    <h2>📌 Chamada</h2>
-
-    <!-- LISTA DE TURMAS -->
-    <div id="lista-turmas" class="grid-turmas"></div>
-
-    <!-- CHAMADA DA TURMA -->
-    <div id="chamada-turma" class="oculto">
-
-      <h3 id="titulo-turma"></h3>
-
-      <table class="tabela">
+      <table class="table">
         <thead>
           <tr>
-            <th>Aluno</th>
+            <th>Nome</th>
+            <th>RA</th>
+            <th>Turma</th>
+            <th>Sala</th>
             <th>Status</th>
-            <th>Observação</th>
+            <th>Ações</th>
           </tr>
         </thead>
 
-        <tbody id="chamada-body"></tbody>
+        <tbody id="alunos-lista"></tbody>
       </table>
+    </section>
 
-      <button onclick="salvarChamada()">💾 Salvar Chamada</button>
-      <button onclick="voltarTurmas()">⬅ Voltar</button>
+    <section id="chamada" class="section oculto">
+      <h2>📌 Chamada</h2>
+      <div id="lista-turmas-chamada"></div>
+    </section>
 
+    <section id="turmas" class="section oculto">
+      <h2>Turmas</h2>
+
+      <div class="topbar">
+        <button onclick="abrirModalTurma()">+ Nova Turma</button>
+      </div>
+
+      <div id="listaTurmas"></div>
+    </section>
+
+  </main>
+</div>
+
+<!-- MODAIS -->
+<div id="modalTurma" class="modal oculto">
+  <div class="modal-box">
+
+    <h3>Nova Turma</h3>
+
+    <input id="nomeTurma" placeholder="Nome">
+    <input id="anoTurma" placeholder="Ano">
+    <input id="turnoTurma" placeholder="Turno">
+
+    <div class="modal-actions">
+      <button onclick="salvarTurma()">Salvar</button>
+      <button onclick="fecharModalTurma()">Cancelar</button>
     </div>
 
   </div>
-
-  <!-- ================= TURMAS ================= -->
-  <div id="turmas" class="section oculto">
-    <h2>Turmas</h2>
-    <p>Em construção...</p>
-  </div>
-
 </div>
 
-<!-- PRONTUÁRIO -->
+<!-- MODAL ALUNO -->
+<div id="modal-aluno" class="modal oculto" onclick="fecharModalAluno()">
+  <div class="modal-box grande" onclick="event.stopPropagation()">
+
+    <h2 id="titulo-modal-aluno">Novo Aluno</h2>
+
+    <input id="aluno-nome" placeholder="Nome">
+    <input id="aluno-ra" placeholder="RA">
+    <input id="aluno-email" placeholder="Email">
+    <input id="aluno-status" placeholder="Status">
+
+    <input id="aluno-turma" placeholder="Turma">
+    <input id="aluno-serie" placeholder="Série">
+    <input id="aluno-sala" placeholder="Sala">
+    <input type="file" id="aluno-foto-input">
+<img id="preview-foto" style="width:100px; display:none; margin-top:10px;">
+
+    <div class="modal-actions">
+      <button onclick="salvarAluno()">Salvar</button>
+      <button onclick="exportarWord()">Word</button>
+      <button onclick="fecharModalAluno()">Cancelar</button>
+    </div>
+
+  </div>
+</div>
+
 <div id="card-aluno" class="card-aluno oculto"></div>
 
-<!-- ================= JS ================= -->
-
-<script src="js/alunos.js"></script>
+<script src="js/core.js"></script>
+<script src="js/alunos.module.js"></script>
+<script src="js/turmas.js"></script>
 <script src="js/chamada.js"></script>
-
-<script>
-
-/* ================= PROTEÇÃO LOGIN ================= */
-if (!localStorage.getItem("token")) {
-  window.location.href = "login.html";
-}
-
-/* ================= SAIR ================= */
-function sair() {
-  localStorage.clear();
-  window.location.href = "login.html";
-}
-
-/* ================= NAVEGAÇÃO ================= */
-function abrirAba(id) {
-
-  document.querySelectorAll(".section")
-    .forEach(s => s.classList.add("oculto"));
-
-  document.getElementById(id).classList.remove("oculto");
-}
-
-</script>
 
 </body>
 </html>

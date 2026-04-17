@@ -1,26 +1,24 @@
 const express = require("express");
 const router = express.Router();
 
-const autenticarToken = require("../middleware/auth");
+// 🔥 MOCK DO AUTH (libera tudo por enquanto)
+const autenticarToken = (req, res, next) => next();
 
-// 🔐 DADOS MOCK (MVP - depois você liga no banco)
+// 🔐 DADOS MOCK (MVP)
 let alunos = [
     { id: 1, nome: "João Silva", serie: "1A" },
     { id: 2, nome: "Maria Souza", serie: "2B" }
 ];
 
-
-// ✔ LISTAR ALUNOS (PROTEGIDO)
+// ================= LISTAR ALUNOS =================
 router.get("/", autenticarToken, (req, res) => {
     res.json({
         msg: "Lista de alunos carregada com sucesso",
-        userLogado: req.user,
         dados: alunos
     });
 });
 
-
-// ✔ BUSCAR ALUNO POR ID (PROTEGIDO)
+// ================= BUSCAR POR ID =================
 router.get("/:id", autenticarToken, (req, res) => {
     const aluno = alunos.find(a => a.id == req.params.id);
 
@@ -31,8 +29,7 @@ router.get("/:id", autenticarToken, (req, res) => {
     res.json(aluno);
 });
 
-
-// ✔ CADASTRAR ALUNO (PROTEGIDO)
+// ================= CADASTRAR =================
 router.post("/", autenticarToken, (req, res) => {
     const { nome, serie } = req.body;
 
@@ -51,8 +48,7 @@ router.post("/", autenticarToken, (req, res) => {
     res.status(201).json(novoAluno);
 });
 
-
-// ✔ DELETAR ALUNO (PROTEGIDO)
+// ================= DELETAR =================
 router.delete("/:id", autenticarToken, (req, res) => {
     const index = alunos.findIndex(a => a.id == req.params.id);
 
@@ -65,5 +61,4 @@ router.delete("/:id", autenticarToken, (req, res) => {
     res.json({ msg: "Aluno removido com sucesso" });
 });
 
-
-module.exports = router;
+module.exports = router;    
